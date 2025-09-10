@@ -6,9 +6,10 @@ import pandas as pd
 
 app = FastAPI()
 
-# Load model and scaler
+# Load model, scaler, and feature names
 model = joblib.load("mlp_classifier.pkl")
 scaler = joblib.load("scaler.pkl")
+feature_names = joblib.load("feature_names.pkl")
 
 # Define input schema
 class InputData(BaseModel):
@@ -19,6 +20,9 @@ def predict(input_data: InputData):
     try:
         # Convert input to DataFrame
         df = pd.DataFrame(input_data.data)
+
+        # Reindex columns to match training order
+        df = df.reindex(columns=feature_names)
 
         # Scale features
         X_scaled = scaler.transform(df)
