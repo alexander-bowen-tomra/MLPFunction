@@ -3,6 +3,12 @@ from pydantic import BaseModel
 import joblib
 import numpy as np
 import pandas as pd
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 
 app = FastAPI()
 
@@ -20,7 +26,7 @@ def predict(input_data: InputData):
     try:
         # Convert input to DataFrame
         df = pd.DataFrame(input_data.data)
-        print("🔍 Raw Input DataFrame:\n", df.head())
+        logger.info("🔍 Raw Input DataFrame:\n", df.head())
 
         # Map unknown machine types to 'Other'
         if "Machine type" in df.columns:
@@ -30,27 +36,27 @@ def predict(input_data: InputData):
 
             # One-hot encode 'Machine type'
             df = pd.get_dummies(df, columns=["Machine type"], drop_first=False)
-            print("🔍 One-Hot Encoded Columns:\n", df.columns.tolist())
+            logger.info("🔍 One-Hot Encoded Columns:\n", df.columns.tolist())
 
         # Add missing columns and reorder to match training features
         missing_cols = [col for col in feature_names if col not in df.columns]
         for col in missing_cols:
             df[col] = 0
         df = df[feature_names]
-        print("🔍 Final Feature Matrix Columns:\n", df.columns.tolist())
-        print("🔍 Missing Columns Added:\n", missing_cols)
+        logger.info("🔍 Final Feature Matrix Columns:\n", df.columns.tolist())
+        logger.info("🔍 Missing Columns Added:\n", missing_cols)
 
         # Scale features
         X_scaled = scaler.transform(df)
-        print("🔍 Scaled Feature Sample:\n", X_scaled[:5])
+        logger.info("🔍 Scaled Feature Sample:\n", X_scaled[:5])
 
         # Predict probabilities
         probs = model.predict_proba(X_scaled)
-        print("🔍 Predicted Probabilities:\n", probs[:5])
+        logger.info("🔍 Predicted Probabilities:\n", probs[:5])
 
         # Compute expected value (continuous output)
         expected_values = (probs * np.array([0, 1, 2, 3])).sum(axis=1)
-        print("🔍 Expected Values:\n", expected_values[:5])
+        logger.info("🔍 Expected Values:\n", expected_values[:5])
 
         return {"predictions": expected_values.tolist()}
 
