@@ -21,8 +21,22 @@ def predict(input_data: InputData):
         # Convert input to DataFrame
         df = pd.DataFrame(input_data.data)
 
-        # Reindex columns to match training order
-        df = df.reindex(columns=feature_names)
+        # Load fixed machine types
+        fixed_machine_types = joblib.load("fixed_machine_types.pkl")
+
+        # Map unknown machine types to 'Other'
+        df["Machine type"] = df["Machine type"].apply(
+            lambda x: x if x in fixed_machine_types else "Other"
+        )
+
+        # One-hot encode 'Machine type'
+        df = pd.get_dummies(df, columns=["Machine type"], drop_first=False)
+
+        # Add missing columns and reorder
+        for col in feature_names:
+            if col not in df.columns:
+                df[col] = 0
+        df = df[feature_names]
 
         # Scale features
         X_scaled = scaler.transform(df)
@@ -30,10 +44,9 @@ def predict(input_data: InputData):
         # Predict probabilities
         probs = model.predict_proba(X_scaled)
 
-        # Compute expected value (continuous output)
+        # Compute expected value
         expected_values = (probs * np.array([0, 1, 2, 3])).sum(axis=1)
 
-        # Return predictions
         return {"predictions": expected_values.tolist()}
 
     except Exception as e:

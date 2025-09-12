@@ -4,6 +4,7 @@
 curl -O https://raw.githubusercontent.com/alexander-bowen-tomra/MLPFunction/main/feature_names.pkl
 curl -O https://raw.githubusercontent.com/alexander-bowen-tomra/MLPFunction/main/scaler.pkl
 curl -O https://raw.githubusercontent.com/alexander-bowen-tomra/MLPFunction/main/feature_names.pkl
+curl -O https://raw.githubusercontent.com/alexander-bowen-tomra/MLPFunction/main/main.py
 
 # Start the FastAPI app
 uvicorn main:app --host 0.0.0.0 --port $PORT
