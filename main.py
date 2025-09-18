@@ -48,15 +48,15 @@ def predict(input_data: InputData):
 
         # Scale features
         X_scaled = scaler.transform(df)
-        logger.info("🔍 Scaled Feature Sample:\n%s", X_scaled[:5])
+        #logger.info("🔍 Scaled Feature Sample:\n%s", X_scaled[:5])
 
         # Predict probabilities
         probs = model.predict_proba(X_scaled)
-        logger.info("🔍 Predicted Probabilities:\n%s", probs[:5])
+        #logger.info("🔍 Predicted Probabilities:\n%s", probs[:5])
 
         # Compute expected value (continuous output)
-        expected_values = (probs * np.array([0, 1, 2, 3])).sum(axis=1)
-        logger.info("🔍 Expected Values:\n%s", expected_values[:5])
+        expected_values = (probs * np.arange(11)).sum(axis=1)
+        #logger.info("🔍 Expected Values:\n%s", expected_values[:5])
 
         return {"predictions": expected_values.tolist()}
 
