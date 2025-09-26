@@ -1,7 +1,9 @@
+
 fastapi
 uvicorn
-pydantic
 pandas
 numpy
 scikit-learn
+imbalanced-learn
 joblib
+matplotlib
