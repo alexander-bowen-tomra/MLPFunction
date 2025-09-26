@@ -1,5 +1,9 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+
+from imblearn.pipeline import Pipeline
+from imblearn.over_sampling import SMOTE
+
 import joblib
 import numpy as np
 import pandas as pd
