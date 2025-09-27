@@ -59,7 +59,7 @@ def predict(input_data: InputData):
         #logger.info("🔍 Predicted Probabilities:\n%s", probs[:5])
 
         # Compute expected value (continuous output)
-        expected_values = (probs * np.arange(11)).sum(axis=1)
+        expected_values = (probs * np.arange(4)).sum(axis=1)
         #logger.info("🔍 Expected Values:\n%s", expected_values[:5])
 
         return {"predictions": expected_values.tolist()}
