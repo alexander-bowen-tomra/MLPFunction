@@ -47,8 +47,8 @@ def predict(input_data: InputData):
                              else "legacy")))
             )
 
-    # One-hot encode the simplified categories
-    df = pd.get_dummies(df, columns=["Machine type"], drop_first=False)
+        # One-hot encode the simplified categories
+        df = pd.get_dummies(df, columns=["Machine type"], drop_first=False)
 
         # Check for missing features
         missing_cols = [col for col in feature_names if col not in df.columns]
