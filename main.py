@@ -37,18 +37,21 @@ def predict(input_data: InputData):
         basic_machines = ["B1", "B3", "B5", "B7", "B9"]
         flow_standalone_machines = ["T70", "T70 Dual", "S1", "S2", "M1", "T70 TriSort", "T70 Single", "T70 Dual Maxi", "T90"]
 
-        # Map machine types to categories
+        # Define machine type to category mapping
+        machine_type_map = {
+            **{m: "backroom" for m in backroom_machines},
+            **{m: "revolution" for m in revolution_machines},
+            **{m: "basic" for m in basic_machines},
+            **{m: "flow_standalone" for m in flow_standalone_machines}
+        }
+
+        # Map machine types to categories, defaulting to 'legacy'
         if "Machine type" in df.columns:
-            df["Machine type"] = df["Machine type"].apply(
-                lambda x: x if x in backroom_machines else
-                ("revolution" if x in revolution_machines
-                 else ("basic" if x in basic_machines
-                       else ("flow_standalone" if x in flow_standalone_machines
-                             else "legacy")))
-            )
+            df["Machine type"] = df["Machine type"].map(machine_type_map).fillna("legacy")
 
         # One-hot encode the simplified categories
         df = pd.get_dummies(df, columns=["Machine type"], drop_first=False)
+
 
         # Check for missing features
         missing_cols = [col for col in feature_names if col not in df.columns]
