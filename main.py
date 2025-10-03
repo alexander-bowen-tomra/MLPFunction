@@ -40,15 +40,20 @@ def predict(input_data: InputData):
 
             # One-hot encode 'Machine type'
             df = pd.get_dummies(df, columns=["Machine type"], drop_first=False)
-            logger.info("🔍 One-Hot Encoded Columns:\n%s", df.columns.tolist())
+            #logger.info("🔍 One-Hot Encoded Columns:\n%s", df.columns.tolist())
 
-        # Add missing columns and reorder to match training features
+        # Check for missing features
         missing_cols = [col for col in feature_names if col not in df.columns]
+        if missing_cols:
+            logger.warning("⚠️ Missing Features in Input: %s", missing_cols)
+
+        # Add missing columns with default value 0
         for col in missing_cols:
             df[col] = 0
+
+        # Reorder columns to match training features
         df = df[feature_names]
-        logger.info("🔍 Final Feature Matrix Columns:\n%s", df.columns.tolist())
-        logger.info("🔍 Missing Columns Added:\n%s", missing_cols)
+
 
         # Scale features
         X_scaled = scaler.transform(df)
@@ -60,7 +65,7 @@ def predict(input_data: InputData):
 
         # Compute expected value (continuous output)
         expected_values = (probs * np.arange(4)).sum(axis=1)
-        #logger.info("🔍 Expected Values:\n%s", expected_values[:5])
+        logger.info("🔍 Expected Values:\n%s", expected_values[:5])
 
         return {"predictions": expected_values.tolist()}
 
