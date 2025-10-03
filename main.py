@@ -19,7 +19,6 @@ app = FastAPI()
 model = joblib.load("mlp_classifier.pkl")
 scaler = joblib.load("scaler.pkl")
 feature_names = joblib.load("feature_names.pkl")
-fixed_machine_types = joblib.load("fixed_machine_types.pkl")
 
 # Define input schema
 class InputData(BaseModel):
@@ -32,15 +31,24 @@ def predict(input_data: InputData):
         df = pd.DataFrame(input_data.data)
         logger.info("🔍 Raw Input DataFrame:\n%s", df.head())
 
-        # Map unknown machine types to 'Other'
+        # Define machine type categories
+        backroom_machines = ["T9", "T8", "T100"]
+        revolution_machines = ["R1", "R2", "R3", "Bulk Collection"]
+        basic_machines = ["B1", "B3", "B5", "B7", "B9"]
+        flow_standalone_machines = ["T70", "T70 Dual", "S1", "S2", "M1", "T70 TriSort", "T70 Single", "T70 Dual Maxi", "T90"]
+
+        # Map machine types to categories
         if "Machine type" in df.columns:
             df["Machine type"] = df["Machine type"].apply(
-                lambda x: x if x in fixed_machine_types else "Other"
+                lambda x: x if x in backroom_machines else
+                ("revolution" if x in revolution_machines
+                 else ("basic" if x in basic_machines
+                       else ("flow_standalone" if x in flow_standalone_machines
+                             else "legacy")))
             )
 
-            # One-hot encode 'Machine type'
-            df = pd.get_dummies(df, columns=["Machine type"], drop_first=False)
-            #logger.info("🔍 One-Hot Encoded Columns:\n%s", df.columns.tolist())
+    # One-hot encode the simplified categories
+    df = pd.get_dummies(df, columns=["Machine type"], drop_first=False)
 
         # Check for missing features
         missing_cols = [col for col in feature_names if col not in df.columns]
